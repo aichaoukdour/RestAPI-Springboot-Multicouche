@@ -94,7 +94,7 @@ L’API sera disponible sur : `http://localhost:8080/api/items`
 
 # API Testing with Postman
 
-![Postman Logo Vector svg ](https://github.com/user-attachments/assets/23daa27b-9fe8-43e7-8eb4-1d4bc8d37581)
+![Postman Logo Vector svg](https://github.com/user-attachments/assets/23daa27b-9fe8-43e7-8eb4-1d4bc8d37581 | width=100)
 
 
 Here are some steps to test the API using Postman:
