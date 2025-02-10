@@ -11,7 +11,6 @@ Elle fournit des opérations CRUD (Créer, Lire, Mettre à jour, Supprimer) et u
 
 - 🔹 Développer une API REST robuste et performante.
 - 🔹 Implémenter la gestion du cache pour optimiser les requêtes.
-- 🔹 Faciliter l'extension et l'intégration avec un frontend.
 
 ---
 
@@ -23,7 +22,7 @@ Elle fournit des opérations CRUD (Créer, Lire, Mettre à jour, Supprimer) et u
 | **Spring Boot**     | Framework pour créer l'API REST. |
 | **Spring Data JPA** | Interaction simplifiée avec la BD. |
 | **Spring Cache**    | Optimisation des performances. |
-| **Spring Security (Optionnel)** | Ajoute une authentification. |
+| **Spring Security** | Ajoute une authentification. |
 | **Maven**          | Gestionnaire de dépendances. |
 | **H2 / MySQL** | Base de données pour stocker les produits. |
 
@@ -95,7 +94,8 @@ L’API sera disponible sur : `http://localhost:8080/api/items`
 
 # API Testing with Postman
 
-![Postman Logo](https://www.postman.com/img/postman-logo-256.png)
+![Postman Logo Vector svg ](https://github.com/user-attachments/assets/23daa27b-9fe8-43e7-8eb4-1d4bc8d37581)
+
 
 Here are some steps to test the API using Postman:
 
