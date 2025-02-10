@@ -96,6 +96,7 @@ L’API sera disponible sur : `http://localhost:8080/api/items`
 
 
 ![image](https://github.com/user-attachments/assets/740e9f8f-34eb-486f-a63b-a9f5666bdbf0)
+<img width="947" alt="image" src="https://github.com/user-attachments/assets/f955d610-f852-4f40-834a-595b5943bf57" />
 ![image](https://github.com/user-attachments/assets/e5bff0bc-1c90-400d-b547-274ab938ee62)
 ![image](https://github.com/user-attachments/assets/4974e690-47fe-4c14-ad49-b9958a2f985c)
 
@@ -122,7 +123,6 @@ Here are some steps to test the API using Postman:
     ```json
     {
       "name": "Produit Test",
-      "description": "Description du produit test",
       "price": 19.99
     }
     ```
@@ -134,8 +134,7 @@ Here are some steps to test the API using Postman:
 - **Body (JSON)**:
     ```json
     {
-      "name": "Produit Modifié",
-      "description": "Description mise à jour",
+      "name": "Product",
       "price": 29.99
     }
     ```
