@@ -93,6 +93,59 @@ L’API sera disponible sur : `http://localhost:8080/api/items`
 
 ---
 
+# API Testing with Postman
+
+![Postman Logo](https://www.postman.com/img/postman-logo-256.png)
+
+Here are some steps to test the API using Postman:
+
+### 1. List Products
+
+- **Method**: GET  
+- **URL**: `http://localhost:8080/api/items`
+
+### 2. Get Details of a Specific Product
+
+- **Method**: GET  
+- **URL**: `http://localhost:8080/api/items/{id}`  
+  Replace `{id}` with a valid product ID.
+
+### 3. Add a Product
+
+- **Method**: POST  
+- **URL**: `http://localhost:8080/api/items`  
+- **Body (JSON)**:
+    ```json
+    {
+      "name": "Produit Test",
+      "description": "Description du produit test",
+      "price": 19.99
+    }
+    ```
+
+### 4. Update a Product
+
+- **Method**: PUT  
+- **URL**: `http://localhost:8080/api/items/{id}`  
+- **Body (JSON)**:
+    ```json
+    {
+      "name": "Produit Modifié",
+      "description": "Description mise à jour",
+      "price": 29.99
+    }
+    ```
+
+### 5. Delete a Product
+
+- **Method**: DELETE  
+- **URL**: `http://localhost:8080/api/items/{id}`  
+  Replace `{id}` with a valid product ID.
+
+
+---
+
+
 ## 🎯 **Améliorations futures**
 - 🔹 **Swagger** pour une meilleure documentation de l'API.
 - 🔹 **JWT** pour une authentification plus sécurisée.
