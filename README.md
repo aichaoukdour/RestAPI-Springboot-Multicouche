@@ -1,8 +1,8 @@
-# 💪 RestAPI - API de Gestion des Produits
+# 💪 RestAPI - API de Gestion des items
 
 ## 📌 Introduction
 
-RestAPI est une application **Spring Boot** qui expose une API REST permettant de gérer une liste de produits.  
+RestAPI est une application **Spring Boot** qui expose une API REST permettant de gérer une liste de items.  
 Elle fournit des opérations CRUD (Créer, Lire, Mettre à jour, Supprimer) et utilise **Spring Cache** pour améliorer les performances.  
 
 ---
@@ -95,7 +95,10 @@ L’API sera disponible sur : `http://localhost:8080/api/items`
 # API Testing with Postman
 
 
-![Postman Logo Vector svg ](https://github.com/user-attachments/assets/3e339243-7243-4020-96ea-67af23fac8dd|width=150)
+![image](https://github.com/user-attachments/assets/740e9f8f-34eb-486f-a63b-a9f5666bdbf0)
+![image](https://github.com/user-attachments/assets/e5bff0bc-1c90-400d-b547-274ab938ee62)
+![image](https://github.com/user-attachments/assets/4974e690-47fe-4c14-ad49-b9958a2f985c)
+
 
 
 Here are some steps to test the API using Postman:
