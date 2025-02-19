@@ -1,13 +1,16 @@
 package com.example.RestAPI.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
+
 @AllArgsConstructor
-public class ItemDTO {
+@NoArgsConstructor
+@Data
+public class ItemResponse {
     private Long id;
     private String name;
-    private Double price;
-
+    private double price;
 }

@@ -1,74 +1,67 @@
 package com.example.RestAPI.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.example.RestAPI.dto.ItemDTO;
-import com.example.RestAPI.service.ItemService;
-
-import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000") // Allow frontend access
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.RestAPI.dto.ItemRequest;
+import com.example.RestAPI.dto.ItemResponse;
+import com.example.RestAPI.service.ItemService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/items")
+@RequiredArgsConstructor
 public class ItemController {
 
-    @Autowired
-    private ItemService itemService;
+    private final ItemService itemService;
 
-
+    // Accès en lecture pour les rôles USER et ADMIN
     @GetMapping
-    public List<ItemDTO> getAllItems() {
+    public List<ItemResponse> getAllItems() {
+        log.info("Fetching all items");
         return itemService.getAllItems();
     }
 
+    // Accès en lecture pour les rôles USER et ADMIN
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDTO> getItemById(@PathVariable Long id) {
-        ItemDTO itemDTO = itemService.getItemById(id);
-        if (itemDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(itemDTO);
+    public ItemResponse getItemById(@PathVariable Long id) {
+        log.info("Fetching item with ID: {}", id);
+        return itemService.getItemById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<ItemDTO> createItem(
-                                              @RequestParam("name") String name,
-                                              @RequestParam("price") Double price) throws IOException {
-       
-        ItemDTO itemDTO = new ItemDTO(null, name, price); // Créer un DTO avec le chemin d'image
-        ItemDTO createdItem = itemService.createItem(itemDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
+    // Accès en écriture uniquement pour le rôle ADMIN
+    @PostMapping("/add")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ItemResponse createItem(@RequestBody ItemRequest itemRequest) {
+        log.info("Creating item with name: {}", itemRequest.getName());
+        return itemService.createItem(itemRequest);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, 
-                                              @RequestParam("name") String name, 
-                                              @RequestParam("price") Double price) throws IOException {
-       
-        
-        ItemDTO itemDTO = new ItemDTO(id, name, price); // Créer un DTO avec le chemin d'image
-        ItemDTO updatedItem = itemService.updateItem(id, itemDTO);
-        
-        if (updatedItem == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Handle item not found
-        }
-
-        return ResponseEntity.ok(updatedItem);
+    // Accès en mise à jour uniquement pour le rôle ADMIN
+    @PutMapping("/update/{id}")
+    public ItemResponse updateItem(@PathVariable Long id, @RequestBody ItemRequest itemRequest) {
+        log.info("Updating item with ID: {}", id);
+        return itemService.updateItem(id, itemRequest);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
-        try {
-            itemService.deleteItem(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Handle item not found
-        }
+    // Accès en suppression uniquement pour le rôle ADMIN et MANAGER
+    @DeleteMapping("/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteItem(@PathVariable Long id) {
+        log.info("Deleting item with ID: {}", id);
+        itemService.deleteItem(id);
     }
-
-  
 }
