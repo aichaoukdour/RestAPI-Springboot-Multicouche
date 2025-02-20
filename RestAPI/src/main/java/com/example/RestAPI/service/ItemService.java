@@ -1,68 +1,74 @@
 package com.example.RestAPI.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import com.example.RestAPI.dto.ItemRequest;
 import com.example.RestAPI.dto.ItemResponse;
-import com.example.RestAPI.entities.Item;
-import com.example.RestAPI.exception.ItemNotFoundException;
+import com.example.RestAPI.exception.GlobalExceptionHandler;
 import com.example.RestAPI.mapper.ItemMapper;
+import com.example.RestAPI.entities.Item;
 import com.example.RestAPI.repository.ItemRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@ExtendWith(MockitoExtension.class)
-class ItemServiceTest {
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ItemService {
 
-    @Mock
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
-    @Mock
-    private ItemMapper itemMapper;
-
-    @InjectMocks
-    private ItemService itemService;
-
-    private Item item;
-    private ItemRequest itemRequest;
-    private ItemResponse itemResponse;
-
-    @BeforeEach
-    void setUp() {
-        item = new Item(1L, "Test Item", 10.0);
-        itemRequest = new ItemRequest("Test Item", 10.0);
-        itemResponse = new ItemResponse(1L, "Test Item", 10.0);
+    public List<ItemResponse> getAllItems() {
+        log.info("Fetching all items");
+        return itemRepository.findAll().stream()
+                .map(itemMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    @Test
-    public void testGetItemById_ShouldReturnItemResponse_WhenItemExists() {
-        // Arrange
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-        when(itemMapper.toResponse(item)).thenReturn(itemResponse);
-
-        // Act
-        ItemResponse response = itemService.getItemById(1L);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(1L, response.getId());
-        assertEquals("Test Item", response.getName());
-        assertEquals(10.0, response.getPrice());
+    public ItemResponse getItemById(Long id) {
+        log.info("Fetching item with ID: {}", id);
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Item not found with ID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id);
+                });
+        return itemMapper.toResponse(item);
     }
 
-    @Test
-    public void testGetItemById_ShouldThrowItemNotFoundException_WhenItemDoesNotExist() {
-        // Arrange
-        when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+    public ItemResponse createItem(ItemRequest itemRequest) {
+        log.info("Creating item with name: {}", itemRequest.getName());
+        Item item = itemMapper.toEntity(itemRequest);
+        Item savedItem = itemRepository.save(item);
+        log.info("Item created with ID: {}", savedItem.getId());
+        return itemMapper.toResponse(savedItem);
+    }
 
-        // Act & Assert
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+    public ItemResponse updateItem(Long id, ItemRequest itemRequest) {
+        log.info("Updating item with ID: {}", id);
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Item not found with ID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id);
+                });
+        item.setName(itemRequest.getName());
+        item.setPrice(itemRequest.getPrice());
+        Item updatedItem = itemRepository.save(item);
+        log.info("Item updated with ID: {}", id);
+        return itemMapper.toResponse(updatedItem);
+    }
+
+    public void deleteItem(Long id) {
+        log.info("Deleting item with ID: {}", id);
+        if (!itemRepository.existsById(id)) {
+            log.error("Item not found with ID: {}", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id);
+        }
+        itemRepository.deleteById(id);
+        log.info("Item deleted with ID: {}", id);
     }
 }

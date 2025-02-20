@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.example.RestAPI.dto.ItemRequest;
 import com.example.RestAPI.dto.ItemResponse;
 import com.example.RestAPI.entities.Item;
-import com.example.RestAPI.exception.ItemNotFoundException;
 import com.example.RestAPI.mapper.ItemMapper;
 import com.example.RestAPI.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,13 +30,12 @@ class ItemServiceTest {
     private ItemService itemService;
 
     private Item item;
-    private ItemRequest itemRequest;
     private ItemResponse itemResponse;
 
     @BeforeEach
     void setUp() {
         item = new Item(1L, "Test Item", 10.0);
-        itemRequest = new ItemRequest("Test Item", 10.0);
+        new ItemRequest("Test Item", 10.0);
         itemResponse = new ItemResponse(1L, "Test Item", 10.0);
     }
 
@@ -63,6 +61,6 @@ class ItemServiceTest {
         when(itemRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+        assertThrows(javax.jcr.ItemNotFoundException.class, () -> itemService.getItemById(1L));
     }
 }
