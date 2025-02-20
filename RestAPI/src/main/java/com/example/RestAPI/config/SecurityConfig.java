@@ -28,8 +28,8 @@ public class SecurityConfig {
                 // Accès en lecture pour les rôles USER, MANAGER et ADMIN
                 .requestMatchers("/api/items").hasAnyRole("ADMIN", "USER", "MANAGER")
                 // Accès en lecture et suppression pour le rôle MANAGER et ADMIN
-                .requestMatchers("/api/items/add","/api/items/update").hasAnyRole("ADMIN")
-                .requestMatchers("/api/items/delete").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/api/items/delete","/api/items/update").hasAnyRole("ADMIN")
+                .requestMatchers("/api/items/add").hasAnyRole("ADMIN", "MANAGER")
                 .anyRequest().authenticated()
             .and()
             .httpBasic()  // Basic authentication
