@@ -2,8 +2,10 @@ package com.example.RestAPI.exception;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class ErrorResponse {
     private int status;
@@ -15,11 +17,4 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public ErrorResponse(int status, String message, List<String> errors) {
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
-
-    // Getters & Setters
 }

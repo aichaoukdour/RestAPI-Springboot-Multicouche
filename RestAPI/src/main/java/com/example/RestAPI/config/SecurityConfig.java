@@ -68,7 +68,7 @@ public class SecurityConfig {
             .roles(Role.USER.name())  // Use enum for roles
             .build();
 
-        UserDetails manager = User.builder()
+        UserDetails manager = User.builder() // The Builder Pattern is used to construct a User object step-by-step, allowing flexibility and readability when creating an object with multiple properties.The Builder pattern is ideal for objects that have many fields, especially when some fields are optional.
             .username("manager")
             .password(encodedManagerPassword)
             .roles(Role.MANAGER.name())  // Use enum for roles

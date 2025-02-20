@@ -2,7 +2,6 @@ package com.example.RestAPI.service;
 
 import com.example.RestAPI.dto.ItemRequest;
 import com.example.RestAPI.dto.ItemResponse;
-import com.example.RestAPI.exception.GlobalExceptionHandler;
 import com.example.RestAPI.mapper.ItemMapper;
 import com.example.RestAPI.entities.Item;
 import com.example.RestAPI.repository.ItemRepository;
@@ -25,7 +24,7 @@ public class ItemService {
 
     public List<ItemResponse> getAllItems() {
         log.info("Fetching all items");
-        return itemRepository.findAll().stream()
+        return itemRepository.findAll().stream() // stream : This converts the list of Item objects into a stream. A stream allows you to process collections of data in a functional way. It enables you to chain operations like map(), filter()
                 .map(itemMapper::toResponse)
                 .collect(Collectors.toList());
     }

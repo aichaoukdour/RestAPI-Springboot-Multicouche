@@ -35,14 +35,14 @@ public class ItemController {
         return itemService.getAllItems();
     }
 
-    // Accès en lecture pour les rôles USER et ADMIN
+    // Read Only for Admin , user and manager
     @GetMapping("/{id}")
     public ItemResponse getItemById(@PathVariable Long id) {
         log.info("Fetching item with ID: {}", id);
         return itemService.getItemById(id);
     }
 
-    // Accès en écriture uniquement pour le rôle ADMIN
+    // Write permission for our  ADMIN
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public ItemResponse createItem(@RequestBody ItemRequest itemRequest) {
@@ -50,14 +50,14 @@ public class ItemController {
         return itemService.createItem(itemRequest);
     }
 
-    // Accès en mise à jour uniquement pour le rôle ADMIN
+    // Edit permission for admin only
     @PutMapping("/update/{id}")
     public ItemResponse updateItem(@PathVariable Long id, @RequestBody ItemRequest itemRequest) {
         log.info("Updating item with ID: {}", id);
         return itemService.updateItem(id, itemRequest);
     }
 
-    // Accès en suppression uniquement pour le rôle ADMIN et MANAGER
+    // access to delete items for ADMIN et MANAGER
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteItem(@PathVariable Long id) {
