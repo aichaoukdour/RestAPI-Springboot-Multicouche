@@ -51,9 +51,9 @@ public class SecurityConfig {
         String encodedManagerPassword = passwordEncoder.encode("manager");
 
         // Log encoded passwords for debugging (remove in production)
-        logger.info("Encoded admin password: {}", encodedAdminPassword);
-        logger.info("Encoded user password: {}", encodedUserPassword);
-        logger.info("Encoded manager password: {}", encodedManagerPassword);
+        logger.info("Encoded admin pass: {}", encodedAdminPassword);
+        logger.info("Encoded user pass: {}", encodedUserPassword);
+        logger.info("Encoded manager pass: {}", encodedManagerPassword);
 
         // Create in-memory users
         UserDetails admin = User.builder()
