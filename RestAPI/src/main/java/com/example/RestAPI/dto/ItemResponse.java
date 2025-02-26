@@ -1,16 +1,45 @@
 package com.example.RestAPI.dto;
 
-
+import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class ItemResponse {
+public class ItemResponse implements Serializable {
+
+    @JsonProperty("id")
     private Long id;
-    private String name;
-    private double price;
+
+    @JsonProperty("name")
+    private String itemName;
+
+    @JsonProperty("price")
+    private double itemPrice;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public double getItemPrice() {
+        return itemPrice;
+    }
+
+    public void setItemPrice(double itemPrice) {
+        this.itemPrice = itemPrice;
+    }
+
 }

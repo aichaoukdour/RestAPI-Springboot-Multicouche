@@ -1,20 +1,18 @@
-package com.example.RestAPI.exception;
+package com.example.RestAPI.model;
 
-import java.util.List;
+import java.util.Date;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@AllArgsConstructor
-@Data
 public class ErrorResponse {
+
     private int status;
     private String message;
-    private List<String> errors;
+    private Date timestamp;
 
     public ErrorResponse(int status, String message) {
         this.status = status;
         this.message = message;
+        this.timestamp = new Date();
     }
 
 }
