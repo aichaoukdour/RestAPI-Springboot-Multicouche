@@ -60,4 +60,5 @@ public class User {
     public void setUserItems(List<Item> userItems) {
         this.userItems = userItems;
     }
+    
 }

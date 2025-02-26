@@ -3,6 +3,7 @@ package com.example.RestAPI.controller;
 import com.example.RestAPI.dto.UserDTO;
 import com.example.RestAPI.dto.UserWithItemsDTO;
 import com.example.RestAPI.entities.User;
+import com.example.RestAPI.exception.NotFoundUserException;
 import com.example.RestAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +33,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
+    public User getUserById(@PathVariable Long id) throws NotFoundUserException {
         return userService.getUserById(id);
     }
 
     @GetMapping("/{id}/items")
-    public ResponseEntity<UserWithItemsDTO> getUserWithItems(@PathVariable Long id) {
+    public ResponseEntity<UserWithItemsDTO> getUserWithItems(@PathVariable Long id) throws NotFoundUserException {
         return ResponseEntity.ok(userService.getUserWithItems(id));
     }
 
@@ -55,7 +56,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) throws NotFoundUserException {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
@@ -68,7 +69,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) throws NotFoundUserException {
         userService.deleteUser(id);
     }
+    
 }

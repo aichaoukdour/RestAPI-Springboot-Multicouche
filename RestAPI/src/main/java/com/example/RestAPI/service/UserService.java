@@ -4,6 +4,7 @@ import com.example.RestAPI.dto.ItemResponse;
 import com.example.RestAPI.dto.UserDTO;
 import com.example.RestAPI.dto.UserWithItemsDTO;
 import com.example.RestAPI.entities.User;
+import com.example.RestAPI.exception.*;
 import com.example.RestAPI.repository.ItemRepository;
 import com.example.RestAPI.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -13,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,17 +32,16 @@ public class UserService {
     @Qualifier("item_repo")
     private final ItemRepository itemRepository;
 
-
-    @Cacheable("users")
+    @Cacheable(value = "users", cacheManager = "usersCacheManager")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
 
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public User getUserById(Long id) {
+    public User getUserById(Long id) throws NotFoundUserException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundUserException(id)); 
     }
 
 
@@ -58,17 +56,17 @@ public class UserService {
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
                 .email(userDTO.getEmail())
-                .password(hashedPassword) 
-                .role(userDTO.getRole()) 
+                .password(hashedPassword)
+                .role(userDTO.getRole())
                 .build();
 
         return userRepository.save(user);
     }
 
 
-    public UserWithItemsDTO getUserWithItems(Long userId) {
+    public UserWithItemsDTO getUserWithItems(Long userId) throws NotFoundUserException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundUserException(userId)); 
 
         List<ItemResponse> items = itemRepository.findByUserId(userId)
                 .stream()
@@ -88,9 +86,9 @@ public class UserService {
 
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public User updateUser(Long id, UserDTO userDTO) {
+    public User updateUser(Long id, UserDTO userDTO) throws NotFoundUserException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+                .orElseThrow(() -> new NotFoundUserException(id)); 
 
         user.setUserName(userDTO.getUserName());
         user.setFirstName(userDTO.getFirstName());
@@ -110,11 +108,11 @@ public class UserService {
 
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id) throws NotFoundUserException {
         if (!userRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé");
+            throw new NotFoundUserException(id); 
         }
         userRepository.deleteById(id);
     }
-    
+
 }
