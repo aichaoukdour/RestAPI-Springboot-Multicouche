@@ -37,13 +37,11 @@ public class UserService {
         return userRepository.findAll();
     }
 
-
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
     public User getUserById(Long id) throws NotFoundUserException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundUserException(id)); 
+                .orElseThrow(() -> new NotFoundUserException(id));
     }
-
 
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
@@ -63,10 +61,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
     public UserWithItemsDTO getUserWithItems(Long userId) throws NotFoundUserException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException(userId)); 
+                .orElseThrow(() -> new NotFoundUserException(userId));
 
         List<ItemResponse> items = itemRepository.findByUserId(userId)
                 .stream()
@@ -83,12 +80,11 @@ public class UserService {
                 .build();
     }
 
-
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
     public User updateUser(Long id, UserDTO userDTO) throws NotFoundUserException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundUserException(id)); 
+                .orElseThrow(() -> new NotFoundUserException(id));
 
         user.setUserName(userDTO.getUserName());
         user.setFirstName(userDTO.getFirstName());
@@ -105,12 +101,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
     public void deleteUser(Long id) throws NotFoundUserException {
         if (!userRepository.existsById(id)) {
-            throw new NotFoundUserException(id); 
+            throw new NotFoundUserException(id);
         }
         userRepository.deleteById(id);
     }
