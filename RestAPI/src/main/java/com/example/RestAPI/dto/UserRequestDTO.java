@@ -1,7 +1,5 @@
 package com.example.RestAPI.dto;
 
-import java.io.Serializable;
-
 import com.example.RestAPI.Enumeration.RoleEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
@@ -10,13 +8,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDTO implements Serializable {
-
-    @NotBlank
+public class UserRequestDTO {
+    
+    @NotBlank(message = "Le nom est obligatoire")
     @JsonProperty("name")
     private String userName;
 
-    @NotBlank
+    @NotBlank(message = "Le prenom est obligatoire")
     @JsonProperty("first_name")
     private String firstName;
 
@@ -85,5 +83,6 @@ public class UserDTO implements Serializable {
     public void setRole(RoleEnum role) {
         this.role = role;
     }
+
 
 }

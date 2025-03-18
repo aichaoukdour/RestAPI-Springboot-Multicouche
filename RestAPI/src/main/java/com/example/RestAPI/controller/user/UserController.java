@@ -1,15 +1,12 @@
-package com.example.RestAPI.controller;
+package com.example.RestAPI.controller.user;
 
-import com.example.RestAPI.dto.UserDTO;
+import com.example.RestAPI.dto.UserRequestDTO;
+import com.example.RestAPI.dto.UserResponseDTO;
 import com.example.RestAPI.dto.UserWithItemsDTO;
-import com.example.RestAPI.entities.User;
 import com.example.RestAPI.exception.NotFoundUserException;
 import com.example.RestAPI.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -18,32 +15,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController("user_controller")
-@RequestMapping("api/v2/users")
+@RestController
+@RequestMapping("/api/v2/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements IUserController {
 
-    @Autowired
-    @Qualifier("user_service")
     private final UserService userService;
 
+    @Override
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponseDTO> getForUser() {
         return userService.getAllUsers();
     }
 
+    @Override
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) throws NotFoundUserException {
+    public UserResponseDTO getByID(@PathVariable Long id) throws NotFoundUserException {
         return userService.getUserById(id);
     }
 
+   
     @GetMapping("/{id}/items")
     public ResponseEntity<UserWithItemsDTO> getUserWithItems(@PathVariable Long id) throws NotFoundUserException {
         return ResponseEntity.ok(userService.getUserWithItems(id));
     }
 
+    @Override
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> create(@Valid @RequestBody UserRequestDTO userRequestDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
@@ -51,12 +50,13 @@ public class UserController {
             return ResponseEntity.badRequest().body(errorMessages);
         }
 
-        User createdUser = userService.createUser(userDTO);
+        UserResponseDTO createdUser = userService.createUser(userRequestDTO);
         return ResponseEntity.ok("User created successfully: " + createdUser.getId());
     }
 
+    @Override
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) throws NotFoundUserException {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO userRequestDTO, BindingResult bindingResult) throws NotFoundUserException {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
@@ -64,13 +64,17 @@ public class UserController {
             return ResponseEntity.badRequest().body(errorMessages);
         }
 
-        User updatedUser = userService.updateUser(id, userDTO);
+        UserResponseDTO updatedUser = userService.updateUser(id, userRequestDTO);
         return ResponseEntity.ok("User updated successfully: " + updatedUser.getId());
     }
 
+    @Override
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) throws NotFoundUserException {
-        userService.deleteUser(id);
+    public void delete(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+        } catch (NotFoundUserException e) {
+            e.printStackTrace();
+        }
     }
-    
 }

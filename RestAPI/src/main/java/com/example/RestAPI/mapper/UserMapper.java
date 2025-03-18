@@ -1,6 +1,7 @@
 package com.example.RestAPI.mapper;
 
-import com.example.RestAPI.dto.UserDTO;
+import com.example.RestAPI.dto.UserRequestDTO;
+import com.example.RestAPI.dto.UserResponseDTO;
 import com.example.RestAPI.dto.UserWithItemsDTO;
 import com.example.RestAPI.entities.User;
 import org.mapstruct.Mapper;
@@ -11,12 +12,10 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
-    UserDTO toUserDTO(User user);
-
-    User toEntity(UserDTO userDTO);
+    UserResponseDTO toUserResponseDTO(User user);
+    User toEntity(UserRequestDTO userRequestDTO);
 
     @Mapping(source = "userItems", target = "items")
     UserWithItemsDTO toUserWithItemsDTO(User user);
-
 }
+

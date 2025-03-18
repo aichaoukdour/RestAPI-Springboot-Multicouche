@@ -1,7 +1,6 @@
 package com.example.RestAPI.service;
 
-import com.example.RestAPI.dto.ItemResponse;
-import com.example.RestAPI.dto.UserDTO;
+
 import com.example.RestAPI.dto.UserWithItemsDTO;
 import com.example.RestAPI.entities.User;
 import com.example.RestAPI.exception.*;
@@ -20,6 +19,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.RestAPI.dto.ItemResponse;
+import com.example.RestAPI.dto.UserRequestDTO;
+import com.example.RestAPI.dto.UserResponseDTO;
+
 @Service("user_service")
 @RequiredArgsConstructor
 public class UserService {
@@ -33,33 +36,32 @@ public class UserService {
     private final ItemRepository itemRepository;
 
     @Cacheable(value = "users", cacheManager = "usersCacheManager")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserResponseDTO(
+                        user.getId(), 
+                        user.getUserName(), 
+                        user.getFirstName(), 
+                        user.getLastName(), 
+                        user.getEmail(), 
+                        user.getRole()))
+                .collect(Collectors.toList());
     }
 
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public User getUserById(Long id) throws NotFoundUserException {
-        return userRepository.findById(id)
+    public UserResponseDTO getUserById(Long id) throws NotFoundUserException {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundUserException(id));
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUserName(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole());
     }
 
-    @Transactional
-    @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public User createUser(UserDTO userDTO) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
-
-        User user = User.builder()
-                .userName(userDTO.getUserName())
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .email(userDTO.getEmail())
-                .password(hashedPassword)
-                .role(userDTO.getRole())
-                .build();
-
-        return userRepository.save(user);
-    }
 
     public UserWithItemsDTO getUserWithItems(Long userId) throws NotFoundUserException {
         User user = userRepository.findById(userId)
@@ -80,25 +82,60 @@ public class UserService {
                 .build();
     }
 
+    
     @Transactional
     @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
-    public User updateUser(Long id, UserDTO userDTO) throws NotFoundUserException {
+    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String hashedPassword = passwordEncoder.encode(userRequestDTO.getPassword());
+
+        User user = User.builder()
+                .userName(userRequestDTO.getUserName())
+                .firstName(userRequestDTO.getFirstName())
+                .lastName(userRequestDTO.getLastName())
+                .email(userRequestDTO.getEmail())
+                .password(hashedPassword)
+                .role(userRequestDTO.getRole())
+                .build();
+
+        user = userRepository.save(user);
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUserName(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole());
+    }
+
+    @Transactional
+    @CacheEvict(value = "users", cacheManager = "usersCacheManager", allEntries = true)
+    public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) throws NotFoundUserException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundUserException(id));
 
-        user.setUserName(userDTO.getUserName());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setEmail(userDTO.getEmail());
+        user.setUserName(userRequestDTO.getUserName());
+        user.setFirstName(userRequestDTO.getFirstName());
+        user.setLastName(userRequestDTO.getLastName());
+        user.setEmail(userRequestDTO.getEmail());
 
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+        if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().isEmpty()) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         }
 
-        user.setRole(userDTO.getRole());
+        user.setRole(userRequestDTO.getRole());
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUserName(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole());
     }
 
     @Transactional
@@ -109,5 +146,4 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
-
 }

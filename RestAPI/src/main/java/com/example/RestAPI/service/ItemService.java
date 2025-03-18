@@ -16,90 +16,70 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.RestAPI.entities.User;
 
 @Slf4j
-@Service("item_service")
+@Service
 @RequiredArgsConstructor
 public class ItemService {
 
-    @Autowired
-    @Qualifier("item_repo")
     private final ItemRepository itemRepository;
-
-    @Autowired
-    @Qualifier("user_repo")
     private final UserRepository userRepository;
-
-    @Autowired
     private final ItemMapper itemMapper;
 
-
-
-    public List<ItemResponse> getItemsForUser(Long userId) {
-        log.info("Fetching items for user with ID: {}", userId);
-        userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
-        List<Item> items = itemRepository.findByUserId(userId);
-        return itemMapper.toResponseList(items); 
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // Supposons que l'email est utilisé comme identifiant
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-   
+    public List<ItemResponse> getItemsForUser() {
+        User user = getCurrentUser();
+        List<Item> items = itemRepository.findByUserId(user.getId());
+        return itemMapper.toResponseList(items);
+    }
 
-    public ItemResponse getItemById(Long userId, Long id) {
-        log.info("Fetching item with ID: {} for user {}", id, userId);
+    public ItemResponse getItemById(Long id) {
+        User user = getCurrentUser();
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id));
-        if (!item.getUser().getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to the user");
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        if (!item.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to you");
         }
-
         return itemMapper.toItemResponse(item);
     }
 
-
-    
-    public ItemResponse createItem(Long userId, ItemRequest itemRequest) {
-        log.info("Creating item for user with ID: {}", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
+    public ItemResponse createItem(ItemRequest itemRequest) {
+        User user = getCurrentUser();
         Item item = itemMapper.toEntity(itemRequest);
         item.setUser(user);
         Item savedItem = itemRepository.save(item);
         return itemMapper.toItemResponse(savedItem);
     }
 
-
-    
-
-    public ItemResponse updateItem(Long userId, Long id, ItemRequest itemRequest) {
-        log.info("Updating item with ID: {} for user {}", id, userId);
+    public ItemResponse updateItem(Long id, ItemRequest itemRequest) {
+        User user = getCurrentUser();
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id));
-        if (!item.getUser().getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to the user");
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        if (!item.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to you");
         }
-
         item.setName(itemRequest.getItemName());
         item.setPrice(itemRequest.getItemPrice());
         Item updatedItem = itemRepository.save(item);
-
         return itemMapper.toItemResponse(updatedItem);
     }
 
-
-
-
-    public void deleteItem(Long userId, Long id) {
-        log.info("Deleting item with ID: {} for user {}", id, userId);
+    public void deleteItem(Long id) {
+        User user = getCurrentUser();
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found with id: " + id));
-        if (!item.getUser().getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to the user");
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        if (!item.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This item does not belong to you");
         }
-
         itemRepository.delete(item);
     }
-
 }
